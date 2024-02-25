@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Психологический опросник</title>
+    <link rel="stylesheet" href="css/style.css"> <!-- Подключаем файл стилей -->
+</head>
+<style>body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa; /* Цвет фона */
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Тень */
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+#question-container {
+    margin-bottom: 20px;
+}
+
+#question {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+#options {
+    display: flex;
+    flex-direction: column;
+}
+
+#options button {
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#options button:hover {
+    background-color: #0056b3;
+}
+
+#options button.selected {
+    background-color: #6c757d; /* Цвет выбранного варианта */
+}
+
+#next-btn {
+    display: block;
+    margin: 0 auto;
+    padding: 10px 20px;
+    background-color: #28a745; /* Цвет кнопки "Далее" */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#next-btn:hover {
+    background-color: #218838; /* Цвет кнопки "Далее" при наведении */
+}
+
+#result {
+    font-size: 1.2rem;
+    margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+    .container {
+        max-width: 90%;
+    }
+}
+</style>
+<body>
+    <div class="container">
+        <h1>Психологический опросник</h1>
+        <div id="question-container">
+            <div id="question"></div>
+            <div id="options"></div>
+        </div>
+        <button id="next-btn" onclick="nextQuestion()">Далее</button>
+        <div id="result"></div>
+    </div>
+    <script src="script.js"></script> <!-- Подключаем файл скриптов -->
+    <script>
+        const questions = [
+            {
+                question: "Сколько времени вы замечаете свои текущие проблемы или симптомы?",
+                options: ["Недавно", "Несколько недель", "Несколько месяцев", "Дольше полугода"]
+            },
+            {
+                question: "Что заставило вас обратиться за помощью сейчас?",
+                options: ["Ухудшение состояния", "Недавние события", "Совет друзей/семьи", "Профессиональная помощь"]
+            },
+            // Добавьте остальные вопросы здесь
+            {
+                question: "Какие эмоции вы часто испытываете? Есть ли какие-то определенные ситуации, в которых они возникают сильнее?",
+                options: ["Грусть", "Страх", "Раздражение", "Безразличие", "Другое"]
+            },
+            {
+                question: "Опишите ваши отношения с окружающими людьми, такими как семья, друзья или коллеги.",
+                options: ["Близкие и поддерживающие", "Конфликтные", "Поверхностные", "Несущественные", "Другое"]
+            },
+            {
+                question: "Есть ли что-то в вашем прошлом, что, по вашему мнению, могло бы влиять на ваше текущее состояние?",
+                options: ["Детские травмы", "Потеря близкого человека", "Трудности в отношениях", "Профессиональные неудачи", "Другое"]
+            },
+            {
+                question: "Как вы проводите свое свободное время? Есть ли у вас увлечения или хобби, которые помогают вам расслабиться?",
+                options: ["Чтение", "Спорт", "Рисование/музыка", "Путешествия", "Другое"]
+            },
+            {
+                question: "Какова ваша оценка вашего общего психологического благополучия на текущий момент от 1 до 10, где 1 - очень плохо, а 10 - отлично?",
+                options: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+            }
+        ];
+
+        let currentQuestion = 0; // Текущий вопрос
+
+        function displayQuestion() {
+            const questionElement = document.getElementById('question');
+            const optionsElement = document.getElementById('options');
+            const currentQuestionObj = questions[currentQuestion];
+
+            questionElement.textContent = currentQuestionObj.question;
+            optionsElement.innerHTML = '';
+
+            currentQuestionObj.options.forEach((option, index) => {
+                const optionButton = document.createElement('button');
+                optionButton.textContent = option;
+                optionButton.onclick = () => selectOption(index);
+                optionsElement.appendChild(optionButton);
+            });
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                displayQuestion();
+            } else {
+                displayResult();
+            }
+        }
+
+        function selectOption(optionIndex) {
+            const options = document.querySelectorAll(`#options button`);
+            options.forEach(option => option.classList.remove('selected'));
+            options[optionIndex].classList.add('selected');
+        }
+
+        function displayResult() {
+    const resultElement = document.getElementById('result');
+    const totalScore = calculateTotalScore();
+    let diagnosis = '';
+    let advice = '';
+
+    if (totalScore >= 20) {
+        diagnosis = 'Высокий уровень тревоги';
+        advice = 'Обратитесь к психологу или психиатру для дальнейшей оценки и лечения. Помните, что профессиональная поддержка может помочь вам разобраться с вашими эмоциями и научить вас эффективным стратегиям управления стрессом.';
+    } else if (totalScore >= 15) {
+        diagnosis = 'Средний уровень тревоги';
+        advice = 'Попробуйте регулярно заниматься релаксационными практиками, такими как медитация и глубокое дыхание. Отдыхайте достаточно, занимайтесь физической активностью и ведите здоровый образ жизни. Обсудите свои чувства и эмоции с близкими друзьями или родственниками.';
+    } else {
+        diagnosis = 'Низкий уровень тревоги';
+        advice = 'Поддерживайте здоровый образ жизни, включая правильное питание, физическую активность и достаточный сон. Занимайтесь хобби и увлечениями, которые доставляют вам удовольствие. Помните, что позитивный взгляд на жизнь и умение находить радость в маленьких вещах могут помочь вам справиться с любыми трудностями.';
+    }
+
+    const quotes = [
+        "Самое важное — это понять самих себя и найти способы борьбы с нашими собственными тревогами.",
+        "Помните, что сильные эмоции временны, и есть много способов управлять ими.",
+        "Забота о себе — это не эгоизм, а необходимость для здоровья и благополучия.",
+        "Не бойтесь обращаться за помощью. Важно найти поддержку и понимание в трудные моменты."
+    ];
+
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]; // Выбираем случайную цитату
+
+    resultElement.innerHTML = `<strong>Диагноз:</strong> ${diagnosis}<br><strong>Советы по лечению:</strong> ${advice}<br><strong>Цитата:</strong> ${randomQuote}`;
+}
+
+
+        function calculateTotalScore() {
+            let totalScore = 0;
+            questions.forEach((question, index) => {
+                const selectedOptionIndex = getSelectedOptionIndex(index);
+                totalScore += selectedOptionIndex;
+            });
+            return totalScore;
+        }
+
+        function getSelectedOptionIndex(questionIndex) {
+            const options = document.querySelectorAll(`#options button`);
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].classList.contains('selected')) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        window.onload = function() {
+            displayQuestion(); // Начинаем опрос при загрузке страницы
+        };
+    </script>
+</body>
+</html>
